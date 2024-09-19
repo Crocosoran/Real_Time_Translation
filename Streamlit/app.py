@@ -24,6 +24,7 @@ def load_model():
     src_dir = os.path.join(project_root, "src")
     source_path = os.path.join(src_dir, "source_vectorisation")
     target_path = os.path.join(src_dir, "target_vectorisation")
+    model_path = os.path.join(project_root, "saved_models/quantized_model/quantized_transformer.tflite")
 
     source_vectorisation = tf.keras.models.load_model(source_path)
     source_vectorisation = source_vectorisation.layers[0]
@@ -37,7 +38,7 @@ def load_model():
     # reloaded = tf.saved_model.load(model_weights)
     # predict_fn = reloaded.signatures['serving_default']
     predict_fn = tf.lite.Interpreter(
-        model_path='/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/saved_models/quantized_model/quantized_transformer.tflite')
+        model_path=model_path)
 
     return source_vectorisation, target_vectorisation, predict_fn
 
