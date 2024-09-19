@@ -275,11 +275,6 @@ class Decoder(layers.Layer):
 class Transformer(tf.keras.Model):
     def __init__(self, source_vocab_size, target_vocab_size, seq_len, embed_dim, dense_output_dim, num_heads,
                  num_layers, dropout_rate=0.1, **kwargs):
-        # if dtype is not None:
-        #     if isinstance(dtype, dict) and 'class_name' in dtype and dtype['class_name'] == 'DTypePolicy':
-        #         dtype = Policy(dtype['config']['name'])
-        #     elif isinstance(dtype, str):
-        #         dtype = Policy(dtype)
         super(Transformer, self).__init__(**kwargs)
 
         self.source_vocab_size = source_vocab_size
@@ -349,11 +344,6 @@ class Transformer(tf.keras.Model):
 @keras.saving.register_keras_serializable()
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     def __init__(self, embed_dim, warmup_steps=4000, **kwargs):
-        # if dtype is not None:
-        #     if isinstance(dtype, dict) and 'class_name' in dtype and dtype['class_name'] == 'DTypePolicy':
-        #         dtype = Policy(dtype['config']['name'])
-        #     elif isinstance(dtype, str):
-        #         dtype = Policy(dtype)
         super(CustomSchedule, self).__init__(**kwargs)
 
         self.embed_dim = embed_dim

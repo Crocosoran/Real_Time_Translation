@@ -5,12 +5,44 @@ Imports
 import sys
 import os
 import streamlit as st
-
+import tensorflow as tf
 # Add the project's root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.data_processing import custom_stadardization_fn
 from predict import show_predict_page
 
 
+
+
+
+# Initiate Model as soon as the App is started + Cache Model
+
+@st.cache_resource
+def load_model():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+    src_dir = os.path.join(project_root, "src")
+    source_path = os.path.join(src_dir, "source_vectorisation")
+    target_path = os.path.join(src_dir, "target_vectorisation")
+
+    source_vectorisation = tf.keras.models.load_model(source_path)
+    source_vectorisation = source_vectorisation.layers[0]
+
+    target_vectorisation = tf.keras.models.load_model(target_path, custom_objects={
+        "custom_stadardization_fn": custom_stadardization_fn
+    })
+    target_vectorisation = target_vectorisation.layers[0]
+
+    model_weights = os.path.join(project_root, "saved_models")
+    # reloaded = tf.saved_model.load(model_weights)
+    # predict_fn = reloaded.signatures['serving_default']
+    predict_fn = tf.lite.Interpreter(
+        model_path='/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/saved_models/quantized_model/quantized_transformer.tflite')
+
+    return source_vectorisation, target_vectorisation, predict_fn
+
+source_vectorisation, target_vectorisation, predict_fn = load_model()
+
 # Execute streamlit from predict.py
 if __name__ == "__main__":
-    show_predict_page()
+    show_predict_page(source_vectorisation, target_vectorisation, predict_fn)

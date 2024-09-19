@@ -111,7 +111,7 @@ def vectorise_data(text_pairs: List, vocab_size: int = 15000, sequence_length: i
 
 def head_cross_attention_scores(source_sentence_tokens, translated_tokens, attention_score):
     ax = plt.gca()
-    ax.matshow(attention_score[:len(translated_tokens),:len(source_sentence_tokens.split())])
+    im = ax.matshow(attention_score[:len(translated_tokens),:len(source_sentence_tokens.split())])
     ax.set_xticks(range(len(source_sentence_tokens.split())))
     ax.set_yticks(range(len(translated_tokens)))
 
@@ -122,10 +122,10 @@ def head_cross_attention_scores(source_sentence_tokens, translated_tokens, atten
     y_labels = [token for token in translated_tokens]
     ax.set_yticklabels(y_labels)
 
-    for t in range(len(translated_tokens)):
-        for s in range(len(source_sentence_tokens.split())):
-            text = ax.text(s,t,np.round(attention_score[t,s],2), ha = 'center', va='center', color='w')
-
+    # for t in range(len(translated_tokens)):
+    #     for s in range(len(source_sentence_tokens.split())):
+    #         text = ax.text(s,t,np.round(attention_score[t,s],2), ha = 'center', va='center', color='w')
+    return im
 
 def plot_attention_scores(source_sentence_tokens, translated_tokens, attention_score):
     fig = plt.figure(figsize=(16,8))
@@ -135,6 +135,7 @@ def plot_attention_scores(source_sentence_tokens, translated_tokens, attention_s
         head = attention_score.numpy()[0,h,:,:]
         head_cross_attention_scores(source_sentence_tokens, translated_tokens, head)
         ax.set_xlabel(f'Head {h+1}')
+
 
     plt.tight_layout
     plt.show()

@@ -8,6 +8,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+
 matplotlib.rcParams['font.family'] = ['Heiti TC']
 
 '''
@@ -33,14 +34,12 @@ model_tv.add(target_vectorisation)
 filepath = "target_vectorisation"
 model_tv.save(filepath, save_format="tf")
 
+
 def create_datasets(source_language: str, target_language: str, batch_size: int = 64):
     def format_dataset(eng, ch):
         eng = source_vectorisation(eng)
         ch = target_vectorisation(ch)
         return (eng, ch[:, :-1]), ch[:, 1:]
-        # return ({
-        #             "english": eng,
-        #             "chinese": ch[:, :-1]}, ch[:, 1:])  # (eng, ch [same as eng length]), ch [one token ahead]
 
     eng_texts = list(source_language)
     ch_texts = list(target_language)
@@ -55,7 +54,7 @@ val_ds = create_datasets(source_language=en_val, target_language=cn_val)
 test_ds = create_datasets(source_language=en_test, target_language=cn_test)
 
 '''
-Train model locally
+Train model locally 
 '''
 
 transformer = Transformer(
@@ -84,9 +83,37 @@ train_out = transformer.fit(
     epochs=1,
     validation_data=val_ds
 )
+
+
+
+'''
+Save the Model in Keras Format
+'''
 transformer.save('/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/saved_models/keras_transformer.keras')
 
 
+
+'''
+Load Model and export it in tf Saved_Model format to allow for the use across GPU and CPU version of tf and keras
+'''
+loaded_model_keras = tf.keras.models.load_model('/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation'
+                                                '/saved_models/transformer.keras', custom_objects={
+    'masked_loss': masked_loss, 'masked_accuracy': masked_accuracy})
+
+
+@tf.function(input_signature=[tf.TensorSpec(shape=[None, transformer.seq_len], dtype=tf.int64),  # Source inputs
+                              tf.TensorSpec(shape=[None, transformer.seq_len], dtype=tf.int64)])  # Target inputs
+def serving_fn(source_inputs, target_inputs):
+    outputs = loaded_model_keras([source_inputs, target_inputs])
+    last_attention_score = loaded_model_keras.decoder.last_attention_scores
+    return {'outputs': outputs, 'last_attention_score': last_attention_score}
+
+
+tf.saved_model.save(
+    loaded_model_keras,
+    export_dir='/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/saved_models/test',
+    signatures={'serving_default': serving_fn}
+)
 
 
 
