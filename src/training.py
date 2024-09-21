@@ -6,6 +6,7 @@ from data_processing import data_load, split_data, vectorise_data
 from model import Transformer, CustomSchedule, masked_accuracy, masked_loss
 import tensorflow as tf
 import matplotlib
+import os
 
 matplotlib.rcParams['font.family'] = ['Heiti TC']
 
@@ -13,7 +14,10 @@ matplotlib.rcParams['font.family'] = ['Heiti TC']
 1) Load, preprocess data, and save source + target vocabularies, respectively
 2) Create train, validation, and test sets
 '''
-text_pairs = data_load("/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/data/cmn-eng/cmn.txt")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+data_path = os.path.join(project_root, "data/cmn-eng/cmn.txt")
+text_pairs = data_load(data_path)
 
 train_pairs, val_pairs, test_pairs = split_data(text_pairs)
 source_vectorisation, target_vectorisation, en, cn = vectorise_data(train_pairs)

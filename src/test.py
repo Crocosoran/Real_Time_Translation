@@ -164,7 +164,7 @@ def export_model(model, export_dir):
 
 
 # Save the wrapped model
-export_model(keras_model, '/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation'
-                          '/saved_models/cream')
+path_to_save_fine_tuned_model = os.path.join(saved_models_path, "fine_tuned_model")
+export_model(keras_model, path_to_save_fine_tuned_model)
 
 # Load it the same way it was originally loaded -> tf.saved_model.load(saved_models_path)!
