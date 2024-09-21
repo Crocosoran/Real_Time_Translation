@@ -11,12 +11,14 @@ sequence simultaneously, capturing different aspects of the relationships betwee
 The Real Time Translation model follows closely the architecture from the original paper. Hence, it is composed of a 
 4-layer Transformer (4-layer Encoder and 4-layer Decoder).
 
+To reduce the model size and allow faster model loading, the model was quantized using TensorFlow Lite.
+
 The font-end and back-end of the web service for Real Time Translation application are managed by Streamlit. 
 To containerise the application and ensure consistent performance across different environments, Docker was utilised.
 
 The containerised application is deployed on Google Cloud Run. [Demo here](https://crocosoran-app-1-2-32712861319.us-central1.run.app)
 
-The application allows for the transaltion of simple sentences from English to Chinese, and subsequently 
+The application allows for the translation of simple sentences from English to Chinese, and subsequently 
 visualises the attention heads for each translated token, providing a visual understanding how the Multi Head
 Attention mechanism captures different aspects/ relationships between tokens.
 

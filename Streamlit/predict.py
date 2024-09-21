@@ -71,7 +71,7 @@ def show_predict_page(source_vectorisation, target_vectorisation, predict_fn):
         predict_fn: loaded, trained transformer model
 
     Description:
-        Renders the web page with all of it's functionalities, as well as the attention score plots.
+        Renders the web page with all of its functionalities, as well as the attention score plots.
     '''
     st.title('English to Chinese Translator')
     # write text
