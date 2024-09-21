@@ -6,13 +6,11 @@ import sys
 import os
 import streamlit as st
 import tensorflow as tf
+
 # Add the project's root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.data_processing import custom_stadardization_fn
 from predict import show_predict_page
-
-
-
 
 
 # Initiate Model as soon as the App is started + Cache Model
@@ -34,16 +32,13 @@ def load_model():
     })
     target_vectorisation = target_vectorisation.layers[0]
 
-    model_weights = os.path.join(project_root, "saved_models")
-    # reloaded = tf.saved_model.load(model_weights)
-    # predict_fn = reloaded.signatures['serving_default']
     predict_fn = tf.lite.Interpreter(
         model_path=model_path)
 
     return source_vectorisation, target_vectorisation, predict_fn
 
+
 source_vectorisation, target_vectorisation, predict_fn = load_model()
 
-# Execute streamlit from predict.py
 if __name__ == "__main__":
     show_predict_page(source_vectorisation, target_vectorisation, predict_fn)

@@ -5,14 +5,13 @@ Imports
 from data_processing import data_load, split_data, vectorise_data
 from model import Transformer, CustomSchedule, masked_accuracy, masked_loss
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import matplotlib
-import numpy as np
 
 matplotlib.rcParams['font.family'] = ['Heiti TC']
 
 '''
-Load and preprocess data
+1) Load, preprocess data, and save source + target vocabularies, respectively
+2) Create train, validation, and test sets
 '''
 text_pairs = data_load("/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/data/cmn-eng/cmn.txt")
 
@@ -94,7 +93,7 @@ transformer.save('/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/sa
 
 
 '''
-Load Model and export it in tf Saved_Model format to allow for the use across GPU and CPU version of tf and keras
+Load and export the model it in tf Saved_Model format to allow for the use across GPU and CPU version of tf and keras
 '''
 loaded_model_keras = tf.keras.models.load_model('/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation'
                                                 '/saved_models/transformer.keras', custom_objects={

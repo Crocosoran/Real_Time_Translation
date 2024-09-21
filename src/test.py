@@ -5,15 +5,18 @@ Imports
 from data_processing import data_load, split_data, vectorise_data
 from model import CustomSchedule, masked_accuracy, masked_loss
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import matplotlib
+import os
 matplotlib.rcParams['font.family'] = ['Heiti TC']
 
 '''
-Load and preprocess data
+Load, preprocess, and create train, validation, and test sets
 '''
-
-text_pairs = data_load("/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation/data/cmn-eng/cmn.txt")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+saved_models_path = os.path.join(project_root, "saved_models")
+data_path = os.path.join(project_root, "data/cmn-eng/cmn.txt")
+text_pairs = data_load(data_path)
 
 train_pairs, val_pairs, test_pairs = split_data(text_pairs)
 source_vectorisation, target_vectorisation, en, cn = vectorise_data(train_pairs)
@@ -42,8 +45,7 @@ test_ds = create_datasets(source_language=en_test, target_language=cn_test)
 Inference
 '''
 
-reloaded = tf.saved_model.load('/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation'
-                               '/saved_models')
+reloaded = tf.saved_model.load(saved_models_path)
 
 predict_fn = reloaded.signatures['serving_default']
 
@@ -68,14 +70,16 @@ ch_index_lookup = dict(zip(range(len(ch_vocab)), ch_vocab))
 translated_sentence = ''.join(
     [ch_index_lookup[output_tokens[i]] for i in range(1, len(output_tokens)) if output_tokens[i] != 0])
 
-
-
-
 '''
-Fine-Tunning: Wrap Model in Keras Wrapper
+Fine-Tuning: Wrap Model in Keras Wrapper
 '''
 
 class KerasWrapper(tf.keras.Model):
+    '''
+    Description:
+        Wraps the loaded model in a Keras Wrapped (functional api) allowing for the model fine-tuning (training
+        on additional data).
+    '''
     def __init__(self, tf_model):
         super(KerasWrapper, self).__init__()
         self.tf_model = tf_model
@@ -132,11 +136,16 @@ translated_sentence = ''.join(
     [ch_index_lookup[output_tokens[i]] for i in range(1, len(output_tokens)) if output_tokens[i] != 0])
 
 '''
-Export Fine-Tunned Wrapped Keras Model
+Export Fine-Tuned Wrapped Keras Model
 '''
 
 # Define a method to export the wrapped model
 def export_model(model, export_dir):
+    '''
+    Description:
+        A custom function that exports the Keras Wrapped Model, by creating an input_signature using the @tf.function
+        decorator
+    '''
     # Create a signature definition for saving
     @tf.function(input_signature=[
         tf.TensorSpec(shape=[None, 30], dtype=tf.int64, name='source_inputs'),
@@ -158,4 +167,4 @@ def export_model(model, export_dir):
 export_model(keras_model, '/Users/daniel/Desktop/PycharmProjects/Real_Time_Translation'
                           '/saved_models/cream')
 
-# Load it the same way it was originally loaded from reload!
+# Load it the same way it was originally loaded -> tf.saved_model.load(saved_models_path)!
